@@ -1,0 +1,32 @@
+{
+    "name": "EASIER Extension",
+    "version": "1.0.0",
+    "description": "Chrome extension to interact with Web3 Geo Dashboard",
+    "manifest_version": 3,
+    "author": "The EASIER Data Initiative",
+    "action":{
+        "default_popup": "index.html",
+        "default_title": "EASIER Extension"
+    },
+    "content_scripts": [
+        {
+            "matches": ["<all_urls>"], 
+            "js": ["contentScript.js"]
+        }
+    ],
+    "permissions": [
+        "storage",
+        "activeTab",
+        "webRequest",
+        "storage",
+        "http://localhost/",
+        "http://127.0.0.1/"
+    ],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "host_permissions": ["https://localhost/*", "http://127.0.0.1/"],
+    "externally_connectable": {
+        "matches": ["http://localhost/*", "http://127.0.0.1/*"]
+    }
+}
