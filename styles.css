@@ -1,0 +1,13 @@
+.active {
+    background-color: #519d81 !important;
+    color: #fff !important;
+}
+
+.btn, .btn-primary {
+    background-color: #519d81 !important;
+    border-color: #519d81 !important;
+}
+
+.nav-item, .nav-link {
+    color: #519d81;
+}

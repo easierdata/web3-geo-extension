@@ -22,7 +22,7 @@ async function fetchData() {
                 indexCell.textContent = x + 1;
 
                 const cidCell = document.createElement('td');
-                cidCell.textContent = Object.keys(result.Keys)[x].slice(0, 12) + '...';
+                cidCell.textContent = Object.keys(result.Keys)[x].slice(0, 24) + '...';
 
                 const typeCell = document.createElement('td');
                 typeCell.textContent = result.Keys[Object.keys(result.Keys)[x]].Type;
