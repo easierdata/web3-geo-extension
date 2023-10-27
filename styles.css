@@ -8,6 +8,18 @@
     border-color: #519d81 !important;
 }
 
+.btn-danger {
+    background-color: #ff0000 !important;
+    border-color: #ff0000 !important;
+    transform: scale(0.75);
+    font-weight: bold;
+}
+
+.btn-danger:hover {
+    background-color: #ff66667e !important;
+    border-color: #ff66667e !important;
+}
+
 .nav-item, .nav-link {
     color: #519d81;
 }
