@@ -34,9 +34,13 @@
             <table class="table table-bordered mt-3" id="pins">
                 <thead>
                     <tr>
-                        <th>#</th>
-                        <th>CID</th>
-                        <th>Type</th>
+                        <th class="centered-header">#</th>
+                        <th class="centered-header">CID</th>
+                        <!-- Create a dropdown list of unique values that appear in the 'Type' column -->
+                        <th class="centered-header">Select Type
+                            <select id="type-filter" class="form-select form-select-sm">
+                                <option value=""></option>
+                            </select></th>
                     </tr>
                 </thead>
                 <tbody>

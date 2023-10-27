@@ -11,3 +11,8 @@
 .nav-item, .nav-link {
     color: #519d81;
 }
+
+.centered-header {
+    text-align: center;
+    vertical-align: middle;
+  }
