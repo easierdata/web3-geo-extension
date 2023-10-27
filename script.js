@@ -133,17 +133,17 @@ function filterTable() {
   input = document.getElementById("type-filter");
   filter = input.value.toUpperCase();
   table = document.getElementById("pins");
-  tr = table.getElementsByTagName("tr");
+  rows = table.getElementsByTagName("tr");
 
   // Loop through all table rows, and hide those who don't match the filter
-  for (i = 1; i < tr.length; i++) {
-    td = tr[i].getElementsByTagName("td")[2]; // assuming "Type" column is the third column
+  for (i = 1; i < rows.length; i++) {
+    td = rows[i].getElementsByTagName("td")[2]; // assuming "Type" column is the third column
     if (td) {
       txtValue = td.textContent || td.innerText;
       if (filter === "ALL" || txtValue.toUpperCase().indexOf(filter) > -1) {
-        tr[i].style.display = "";
+        rows[i].style.display = "";
       } else {
-        tr[i].style.display = "none";
+        rows[i].style.display = "none";
       }
     }
   }
