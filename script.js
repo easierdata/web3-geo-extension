@@ -18,26 +18,40 @@ async function fetchData() {
       const tableBody = document.querySelector("#pins tbody");
       tableBody.innerHTML = "";
 
-            for (let x = 0; x < Object.keys(result.Keys).length; x++) {
-                const row = document.createElement('tr');
-                
-                const indexCell = document.createElement('td');
-                indexCell.textContent = x + 1;
+      for (let x = 0; x < Object.keys(result.Keys).length; x++) {
+        const row = document.createElement("tr");
 
-                const cidCell = document.createElement('td');
-                cidCell.textContent = Object.keys(result.Keys)[x].slice(0, 24) + '...';
+        const indexCell = document.createElement("td");
+        indexCell.textContent = x + 1;
 
-                const typeCell = document.createElement('td');
-                typeCell.textContent = result.Keys[Object.keys(result.Keys)[x]].Type;
-            
-                row.appendChild(indexCell);
-                row.appendChild(cidCell);
-                row.appendChild(typeCell);
+        const cidCell = document.createElement("td");
+        cidCell.textContent = Object.keys(result.Keys)[x].slice(0, 24) + "...";
 
-                tableBody.appendChild(row);
-            }
-        }
-    })
+        const typeCell = document.createElement("td");
+        typeCell.textContent = result.Keys[Object.keys(result.Keys)[x]].Type;
+
+        row.appendChild(indexCell);
+        row.appendChild(cidCell);
+        row.appendChild(typeCell);
+        // Add remove button to row
+        row.appendChild(addRemoveButtonToRow());
+
+        tableBody.appendChild(row);
+      }
+    }
+  });
+}
+
+//
+function addRemoveButtonToRow() {
+  // Create a div and a button to display remove pin option
+  const container = document.createElement("div");
+  const button = document.createElement("button");
+  button.innerText = "X";
+
+  button.classList.add("btn", "btn-danger");
+  container.appendChild(button);
+  return container;
 }
 
 /* Switch to settings tab */
