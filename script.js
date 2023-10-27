@@ -16,22 +16,24 @@ async function fetchData() {
             tableBody.innerHTML = '';
 
             for (let x = 0; x < Object.keys(result.Keys).length; x++) {
-                const row = document.createElement('tr');
+                if (result.Keys[Object.keys(result.Keys)[x]].Type == "recursive") {
+                    const row = document.createElement('tr');
                 
-                const indexCell = document.createElement('td');
-                indexCell.textContent = x + 1;
+                    const indexCell = document.createElement('td');
+                    indexCell.textContent = x + 1;
 
-                const cidCell = document.createElement('td');
-                cidCell.textContent = Object.keys(result.Keys)[x].slice(0, 24) + '...';
+                    const cidCell = document.createElement('td');
+                    cidCell.textContent = Object.keys(result.Keys)[x].slice(0, 24) + '...';
 
-                const typeCell = document.createElement('td');
-                typeCell.textContent = result.Keys[Object.keys(result.Keys)[x]].Type;
-            
-                row.appendChild(indexCell);
-                row.appendChild(cidCell);
-                row.appendChild(typeCell);
+                    const typeCell = document.createElement('td');
+                    typeCell.textContent = result.Keys[Object.keys(result.Keys)[x]].Type;
+                
+                    row.appendChild(indexCell);
+                    row.appendChild(cidCell);
+                    row.appendChild(typeCell);
 
-                tableBody.appendChild(row);
+                    tableBody.appendChild(row);
+                }
             }
         }
     })
