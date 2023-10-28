@@ -117,9 +117,6 @@ function clickedSettings() {
     document.getElementById("port").value = result.node_port;
   });
 }
-document
-  .getElementById("settings-tab")
-  .addEventListener("click", clickedSettings);
 
 /* Switch to pins tab */
 function clickedPins() {
@@ -140,7 +137,6 @@ function clickedPins() {
   // After fetching data, get the unique types and add them to the filter options
   getUniqueTypes();
 }
-document.getElementById("pin-tab").addEventListener("click", clickedPins);
 
 function getUniqueTypes() {
   // Get the value of the input field with id="filterInput"
@@ -184,7 +180,7 @@ function getUniqueTypes() {
   });
 }
 
-// Filter the table based on the selected type in the drop down menu
+/* Filter table based on the selected type in the drop down menu */
 function filterTable() {
   // Declare variables
   let input, filter, table, tr, td, i, txtValue;
@@ -207,9 +203,6 @@ function filterTable() {
   }
 }
 
-// Add event listener to the filter table based on the selected type in the drop down menu
-document.getElementById("type-filter").addEventListener("change", filterTable);
-
 /* Save node configuration */
 async function saveSettings() {
   let ip = document.getElementById("ip").value;
@@ -224,8 +217,36 @@ async function saveSettings() {
       alert("Saved configuration!");
     });
 }
+
+/* Event listener actions*/
+
+// Add event listener to the settings tab
+document
+  .getElementById("settings-tab")
+  .addEventListener("click", clickedSettings);
+
+// Add event listener to the pins tab
+document.getElementById("pin-tab").addEventListener("click", clickedPins);
+
+// Add event listener to the filter table based on the selected type in the drop down menu
+document.getElementById("type-filter").addEventListener("change", filterTable);
+
+// Add event listener when the `remove-pin` button is clicked and activate the `removePin` function by passing in
+// the corresponding value associated with the hidden `pin-id` element
+document.addEventListener("click", function (event) {
+  if (event.target.matches("#remove-pin")) {
+    // Get the CID value from the hidden input element
+    const pinId = event.target.parentElement.firstChild.value;
+    // Get the row index of the button that was clicked. Note that the index starts at 0 but the first row is the header
+    const rowId = event.target.parentElement.parentElement.rowIndex;
+    removePin(pinId, rowId);
+  }
+});
+
 document
   .getElementById("save-settings")
   .addEventListener("click", saveSettings);
 
+// Create variable that stores the default dropdown value for the `Type` filter
+let lastState = localStorage.setItem("filterType", "All");
 fetchData();
