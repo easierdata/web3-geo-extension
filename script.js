@@ -25,6 +25,8 @@ async function fetchData() {
         indexCell.textContent = x + 1;
 
         const cidCell = document.createElement("td");
+        // apply CID value to id attribute
+        const cid_value = Object.keys(result.Keys)[x];
         cidCell.textContent = Object.keys(result.Keys)[x].slice(0, 24) + "...";
 
         const typeCell = document.createElement("td");
