@@ -36,7 +36,7 @@ async function fetchData() {
         row.appendChild(cidCell);
         row.appendChild(typeCell);
         // Add remove button to row
-        row.appendChild(addRemoveButtonToRow());
+        row.appendChild(addRemoveButtonToRow(cid_value));
 
         tableBody.appendChild(row);
       }
@@ -44,14 +44,25 @@ async function fetchData() {
   });
 }
 
-//
-function addRemoveButtonToRow() {
+/* Add remove button to row */
+function addRemoveButtonToRow(cid) {
   // Create a div and a button to display remove pin option
   const container = document.createElement("div");
+  const hiddenInput = document.createElement("input");
   const button = document.createElement("button");
-  button.innerText = "X";
 
+  // Setting style and attributes for button
+  button.innerText = "X";
+  button.id = "remove-pin";
   button.classList.add("btn", "btn-danger");
+
+  // Setting style and attributes for hidden value
+  hiddenInput.type = "hidden";
+  hiddenInput.id = "pin-id";
+  hiddenInput.value = cid;
+
+  // Add elements to container
+  container.appendChild(hiddenInput);
   container.appendChild(button);
   return container;
 }
