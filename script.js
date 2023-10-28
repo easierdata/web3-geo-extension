@@ -132,12 +132,12 @@ function clickedPins() {
   let pins = document.getElementById("pins");
   pins.style.display = "block";
 
+  // Fetch data, capture the unique `Type` values and add them to the filter options
   fetchData();
-
-  // After fetching data, get the unique types and add them to the filter options
   getUniqueTypes();
 }
 
+/* Get unique types and add them to the filter options */
 function getUniqueTypes() {
   // Get the value of the input field with id="filterInput"
   const typeFilter = document.getElementById("type-filter");
