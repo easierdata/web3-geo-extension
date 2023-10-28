@@ -67,6 +67,37 @@ function addRemoveButtonToRow(cid) {
   return container;
 }
 
+/*Event action that removes the Pinned id from local IPFS node */
+async function removePin(cid, rowid) {
+  chrome.storage.local.get(["node_ip", "node_port"]).then(async (keys) => {
+    const response = await fetch(
+      `http://${keys.node_ip}:${keys.node_port}/api/v0/pin/rm?arg=${cid}`,
+      {
+        method: "POST",
+      }
+    );
+    if (response.status === 200) {
+      // refresh the table by removing the row with the corresponding cid that was just removed
+      const table = document.getElementById("pins");
+      table.deleteRow(rowid);
+    } else {
+      alert("Failed to remove pin!");
+    }
+  });
+}
+
+/* Return an array rows in the table that are not hidden based on filters */
+function getVisibleRows(table) {
+  const rows = table.getElementsByTagName("tr");
+  const visibleRows = Array.from(rows).filter((row) => {
+    return (
+      !row.hasAttribute("style") ||
+      row.getAttribute("style") !== "display: none;"
+    );
+  });
+  return visibleRows;
+}
+
 /* Switch to settings tab */
 function clickedSettings() {
   let tab = document.getElementById("pin-tab");
