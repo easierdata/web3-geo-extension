@@ -17,6 +17,22 @@ async function handleButtonClick() {
     }
 }
 
+async function handleDownloadClick() {
+    const result = await chrome.runtime.sendMessage({ type: "get" });
+    const label = document.getElementsByClassName("ipfs-cid-text")[0]
+    const cid = label.innerText.split(" ")[2]
+    
+    const response = await fetch(`http://${JSON.parse(result).node_ip}:${JSON.parse(result).node_port}/api/v0/get?arg=${cid}`, {
+        method: 'POST',
+    });
+
+    if (response.status === 200) {
+        alert("Successfully downloaded!")
+    } else {
+        alert("Failed to download")
+    }
+}
+
 /*
     Get ipfs metadata if popup is displayed
 */
@@ -56,6 +72,9 @@ document.addEventListener('click', function (event) {
     /* Add event listener to pinButton ID */
     if (event.target.matches('#pinButton')) {
         handleButtonClick();
+    }
+    else if (event.target.matches('#downloadButton')) {
+        handleDownloadClick();
     } else {
         getIPFSMetadata();
     }
