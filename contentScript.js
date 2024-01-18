@@ -10,7 +10,11 @@ async function handleButtonClick() {
         method: 'POST',
     });
 
-    if (response.status === 200) {
+    const mfs_response = await fetch(`http://${JSON.parse(result).node_ip}:${JSON.parse(result).node_port}/api/v0/files/cp?arg=/ipfs/${cid}&arg=/`, {
+        method: 'POST',
+    });
+
+    if (response.status === 200 && mfs_response.status === 200) {
         alert("Successfully pinned!")
     } else {
         alert("Failed to pin")
