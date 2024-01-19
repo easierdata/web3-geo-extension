@@ -4,7 +4,7 @@ This project complements the [Web3-Geo-Dashboard](https://github.com/easierdata/
 
 ### Setup
 
-In your IPFS Daemon WebUI configure the IPFS Config to allow API requests by adding your project domain to the `API.HTTPHeaders.Access-Control-Allow-Origin` array. Alternatively, you can use an asterisk (`*`) to allow everything (I do not recommend this).
+In your IPFS Daemon WebUI configure the IPFS Config to allow API requests by adding your project domain to the `API.HTTPHeaders.Access-Control-Allow-Origin` array in addition to the chrome extension (chrome-extension://<id-goes-here>). Alternatively, you can use an asterisk (`*`) to allow everything (I do not recommend this).
 
 ![1695046837924](image/README/1695046837924.png)
 
