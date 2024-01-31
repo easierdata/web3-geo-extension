@@ -10,9 +10,16 @@ async function handleButtonClick() {
         method: 'POST',
     });
 
-    const mfs_response = await fetch(`http://${JSON.parse(result).node_ip}:${JSON.parse(result).node_port}/api/v0/files/cp?arg=/ipfs/${cid}&arg=/`, {
-        method: 'POST',
-    });
+    let mfs_response;
+    if (JSON.parse(result).node_dir != undefined && JSON.parse(result).node_dir.length > 1) {
+        mfs_response = await fetch(`http://${JSON.parse(result).node_ip}:${JSON.parse(result).node_port}/api/v0/files/cp?arg=/ipfs/${cid}&arg=${JSON.parse(result).node_dir}`, {
+            method: 'POST',
+        });
+    } else {
+        mfs_response = await fetch(`http://${JSON.parse(result).node_ip}:${JSON.parse(result).node_port}/api/v0/files/cp?arg=/ipfs/${cid}&arg=/`, {
+            method: 'POST',
+        });
+    }
 
     if (response.status === 200 && mfs_response.status === 200) {
         alert("Successfully pinned!")

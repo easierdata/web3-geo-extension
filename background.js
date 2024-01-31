@@ -1,7 +1,7 @@
 /* Receive message and pin */
 let config = {}
 
-chrome.storage.local.get(["node_ip", "node_port"]).then((keys) => {
+chrome.storage.local.get(["node_ip", "node_port", "node_dir"]).then((keys) => {
     config = keys
 })
 
