@@ -112,9 +112,10 @@ function clickedSettings() {
   let pins = document.getElementById("pins");
   pins.style.display = "none";
 
-  chrome.storage.local.get(["node_ip", "node_port"]).then((result) => {
+  chrome.storage.local.get(["node_ip", "node_port", "node_dir"]).then((result) => {
     document.getElementById("ip").value = result.node_ip;
     document.getElementById("port").value = result.node_port;
+    document.getElementById("dir").value = result.node_dir;
   });
 }
 
@@ -205,17 +206,48 @@ function filterTable() {
 
 /* Save node configuration */
 async function saveSettings() {
+  let dir = document.getElementById("dir").value;
   let ip = document.getElementById("ip").value;
   let port = document.getElementById("port").value;
+
+  // Check edge cases
+  if (dir != "") {
+    if (dir[0] != "/") {
+      alert('Directory must start with "/"');
+      return;
+    }
+
+    if (dir[dir.length - 1] == "/") {
+      alert('Directory must not end with "/"');
+      return;
+    }
+
+    await createMFSDir(ip, port, dir);
+  }
 
   chrome.storage.local
     .set({
       node_ip: ip,
       node_port: port,
+      node_dir: dir,
     })
     .then(() => {
       alert("Saved configuration!");
     });
+}
+
+/*Create MFS directory in IPFS node*/
+async function createMFSDir(node_ip, node_port, directory) {
+  const response = await fetch(
+    `http://${node_ip}:${node_port}/api/v0/files/mkdir?arg=${directory}&cid-version=1&parents=true`,
+    {
+      method: "POST",
+    }
+  );
+
+  if (response.status !== 200) {
+    alert("Failed to create MFS directory pin!");
+  }
 }
 
 /* Event listener actions*/
