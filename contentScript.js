@@ -3,20 +3,23 @@ let popup = false;
 /* Send call to service worker */
 async function handleButtonClick() {
     const result = await chrome.runtime.sendMessage({ type: "get" });
-    const label = document.getElementsByClassName("ipfs-cid-text")[0]
-    const cid = label.innerText.split(" ")[2]
-    
+    const cidLabel = document.getElementsByClassName("ipfs-cid-text")[0];
+    const cid = cidLabel.innerText.split(" ")[2];
+
+    const nameLabel = document.getElementsByClassName("name-text")[0];
+    const fileName = nameLabel.innerText.split(" ")[1];
+
     const response = await fetch(`http://${JSON.parse(result).node_ip}:${JSON.parse(result).node_port}/api/v0/pin/add?arg=${cid}&recursive=true`, {
         method: 'POST',
     });
 
     let mfs_response;
     if (JSON.parse(result).node_dir != undefined && JSON.parse(result).node_dir.length > 1) {
-        mfs_response = await fetch(`http://${JSON.parse(result).node_ip}:${JSON.parse(result).node_port}/api/v0/files/cp?arg=/ipfs/${cid}&arg=${JSON.parse(result).node_dir}/`, {
+        mfs_response = await fetch(`http://${JSON.parse(result).node_ip}:${JSON.parse(result).node_port}/api/v0/files/cp?arg=/ipfs/${cid}&arg=${JSON.parse(result).node_dir}/${fileName}`, {
             method: 'POST',
         });
     } else {
-        mfs_response = await fetch(`http://${JSON.parse(result).node_ip}:${JSON.parse(result).node_port}/api/v0/files/cp?arg=/ipfs/${cid}&arg=/`, {
+        mfs_response = await fetch(`http://${JSON.parse(result).node_ip}:${JSON.parse(result).node_port}/api/v0/files/cp?arg=/ipfs/${cid}&arg=/${fileName}`, {
             method: 'POST',
         });
     }
