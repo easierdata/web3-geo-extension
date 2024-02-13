@@ -1,7 +1,7 @@
 let popup = false;
 
 /* Send call to service worker */
-async function handleButtonClick() {
+async function handlePinClick() {
     const result = await chrome.runtime.sendMessage({ type: "get" });
     const cidLabel = document.getElementsByClassName("ipfs-cid-text")[0];
     const cid = cidLabel.innerText.split(" ")[2];
@@ -88,6 +88,36 @@ async function getIPFSMetadata() {
     }
 }
 
+async function handleMultiPinClick() {
+    const result = await chrome.runtime.sendMessage({ type: "get" });
+    const label = document.getElementById("cidArray");
+    const cids = label.innerText;
+
+    for (let x = 0; x < JSON.parse(cids).length; x++) {
+        let cid = JSON.parse(cids)[x];
+        const response = await fetch(`http://${JSON.parse(result).node_ip}:${JSON.parse(result).node_port}/api/v0/pin/add?arg=${cid}&recursive=true`, {
+            method: 'POST',
+        });
+
+        let mfs_response;
+        if (JSON.parse(result).node_dir != undefined && JSON.parse(result).node_dir.length > 1) {
+            mfs_response = await fetch(`http://${JSON.parse(result).node_ip}:${JSON.parse(result).node_port}/api/v0/files/cp?arg=/ipfs/${cid}&arg=${JSON.parse(result).node_dir}/${fileName}`, {
+                method: 'POST',
+            });
+        } else {
+            mfs_response = await fetch(`http://${JSON.parse(result).node_ip}:${JSON.parse(result).node_port}/api/v0/files/cp?arg=/ipfs/${cid}&arg=/${fileName}`, {
+                method: 'POST',
+            });
+        }
+        
+        if (response.status !== 200 && mfs_response.status !== 200) {
+            alert("Failed to pin, continuing")
+        } 
+    }
+
+    alert("Successfully pinned!")
+}
+
 const delay = ms => new Promise(res => setTimeout(res, ms));
 
 /* Handle clicks */
@@ -95,12 +125,14 @@ document.addEventListener('click', function (event) {
     /* Add event listener to pinButton ID */
     console.log(event.target);
     if (event.target.matches('#pinButton')) {
-        handleButtonClick();
+        handlePinClick();
     }
     else if (event.target.matches('#downloadButton')) {
         handleDownloadClick();
     } else if (event.target.matches('.mapboxgl-canvas')){
         getIPFSMetadata();
+    } else if (event.target.matches('#multiPin')){
+        handleMultiPinClick();
     }
 });
 
