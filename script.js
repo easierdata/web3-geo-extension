@@ -45,8 +45,13 @@ async function fetchData() {
 }
 
 async function fetchMFSData(directory) {
+  console.log(directory);
   let dir = "";
-  if (directory == "" || directory == null) dir = "/"
+  if (directory == "" || directory == null) {
+    dir = "/"
+  } else {
+    dir = directory
+  }
 
   chrome.storage.local.get(["node_ip", "node_port"]).then(async (keys) => {
     const response = await fetch(
@@ -78,6 +83,18 @@ async function fetchMFSData(directory) {
 
         const typeCell = document.createElement("td");
         typeCell.textContent = result.Entries[x].Type == 1 ? "Directory" : "File";
+
+        // Add onclick handler to cidCell if type is Directory
+        if (result.Entries[x].Type == 1) {
+          // Make it appear as a link
+          cidCell.style.color = "blue";
+          cidCell.style.textDecoration = "underline";
+          cidCell.style.cursor = "pointer";
+          cidCell.onclick = function() {
+            let ep = `${dir}${result.Entries[x].Name}/`
+            fetchMFSData(ep)
+          };
+        }
 
         row.appendChild(indexCell);
         row.appendChild(cidCell);
