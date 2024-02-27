@@ -44,6 +44,53 @@ async function fetchData() {
   });
 }
 
+async function fetchMFSData(directory) {
+  let dir = "";
+  if (directory == "" || directory == null) dir = "/"
+
+  chrome.storage.local.get(["node_ip", "node_port"]).then(async (keys) => {
+    const response = await fetch(
+      `http://${keys.node_ip}:${keys.node_port}/api/v0/files/ls?arg=${dir}&long=true&U=true`,
+      {
+        method: "POST",
+        headers: {
+          accept: "*/*",
+        },
+      }
+    );
+
+    const result = await response.json();
+
+    if (result.Entries.length > 0) {
+      const tableBody = document.querySelector("#pins tbody");
+      tableBody.innerHTML = "";
+
+      for (let x = 0; x < result.Entries.length; x++) {
+        const row = document.createElement("tr");
+
+        const indexCell = document.createElement("td");
+        indexCell.textContent = x + 1;
+
+        const cidCell = document.createElement("td");
+        // apply CID value to id attribute
+        const cid_value = result.Entries[x].Hash;
+        cidCell.textContent = result.Entries[x].Hash.slice(0, 24) + "...";
+
+        const typeCell = document.createElement("td");
+        typeCell.textContent = result.Entries[x].Type == 1 ? "Directory" : "File";
+
+        row.appendChild(indexCell);
+        row.appendChild(cidCell);
+        row.appendChild(typeCell);
+        // Add remove button to row
+        row.appendChild(addRemoveButtonToRow(cid_value));
+
+        tableBody.appendChild(row);
+      }
+    }
+  });
+}
+
 /* Add remove button to row */
 function addRemoveButtonToRow(cid) {
   // Create a div and a button to display remove pin option
@@ -134,7 +181,7 @@ function clickedPins() {
   pins.style.display = "block";
 
   // Fetch data, capture the unique `Type` values and add them to the filter options
-  fetchData();
+  fetchMFSData();
   getUniqueTypes();
 }
 
@@ -143,29 +190,12 @@ function getUniqueTypes() {
   // Get the value of the input field with id="filterInput"
   const typeFilter = document.getElementById("type-filter");
 
-  // Get the table
-  const table = document.getElementById("pins");
-
-  // Get the table body
-  let tableBody = table.getElementsByTagName("tbody")[0];
-
-  // Get all rows in the table body
-  const rows = table.getElementsByTagName("tr");
-
   // create a set to store unique values
   const types = new Set();
   // Add an "All" option to the filter
   types.add("All");
-
-  // loop through all table rows, and add the unique values to the set
-  for (let i = 0; i < rows.length; i++) {
-    const cells = rows[i].getElementsByTagName("td");
-    const cell = cells[2]; // assuming "Type" column is the third column
-    if (cell) {
-      const cellValue = cell.textContent || cell.innerText;
-      types.add(cellValue.trim());
-    }
-  }
+  types.add("Directory");
+  types.add("File");
 
   // If the drop down already has options, remove them
   if (typeFilter.options.length > 0) {
@@ -281,4 +311,5 @@ document
 
 // Create variable that stores the default dropdown value for the `Type` filter
 let lastState = localStorage.setItem("filterType", "All");
-fetchData();
+fetchMFSData();
+getUniqueTypes();
