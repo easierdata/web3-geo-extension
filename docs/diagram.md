@@ -132,7 +132,7 @@ graph LR
 
 ## Sequence Diagrams for functions in contentScript.js
 
-### Sequence of the `handlePinClick` function
+### Sequence of the `handlePinClick` function that sends call to service worker to pin feature
 
 ```mermaid
 sequenceDiagram
@@ -141,7 +141,7 @@ sequenceDiagram
     participant ContentScript as contentScript.js
     participant BackgroundScript as background.js
     participant IPFS as IPFS Node
-    User->>Document: Clicks on pinButton
+    User->>Document: Clicks on pinButton from pop-up
     Document->>ContentScript: Triggers handlePinClick function
     ContentScript->>BackgroundScript: Sends message to get IPFS node details
     BackgroundScript-->>ContentScript: Returns IPFS node details
@@ -152,7 +152,7 @@ sequenceDiagram
     ContentScript->>User: Updates UI
 ```
 
-### Sequence of the `handleDownloadClick` function
+### Sequence of the `handleDownloadClick` function that sends call to service worker to download feature
 
 ```mermaid
 sequenceDiagram
@@ -161,7 +161,7 @@ sequenceDiagram
     participant ContentScript as contentScript.js
     participant BackgroundScript as background.js
     participant IPFS as IPFS Node
-    User->>Document: Clicks on downloadButton
+    User->>Document: Clicks on downloadButton from pop-up
     Document->>ContentScript: Triggers handleDownloadClick function
     ContentScript->>BackgroundScript: Sends message to get IPFS node details
     BackgroundScript-->>ContentScript: Returns IPFS node details
@@ -170,7 +170,7 @@ sequenceDiagram
     ContentScript->>User: Updates UI
 ```
 
-### Sequence of the `getIPFSMetadata` function
+### Sequence of the `getIPFSMetadata` function that gets ipfs metadata if popup is displayed
 
 ```mermaid
 sequenceDiagram
@@ -179,7 +179,7 @@ sequenceDiagram
     participant ContentScript as contentScript.js
     participant BackgroundScript as background.js
     participant IPFS as IPFS Node
-    User->>Document: Clicks on mapboxgl-canvas
+    User->>Document: Clicks on feature in map
     Document->>ContentScript: Triggers getIPFSMetadata function
     ContentScript->>BackgroundScript: Sends message to get IPFS node details
     BackgroundScript-->>ContentScript: Returns IPFS node details
@@ -188,7 +188,7 @@ sequenceDiagram
     ContentScript->>User: Updates UI
 ```
 
-### Sequence of the `handleMultiPinClick` function
+### Sequence of the `handleMultiPinClick` function when multiple features are selected
 
 ```mermaid
 sequenceDiagram
@@ -210,149 +210,102 @@ sequenceDiagram
 
 ## Sequence Diagrams for functions in script.js
 
-### Sequence of the "save-settings" click event
+### Sequence of how the settings form is saved
 
 ```mermaid
 sequenceDiagram
     participant User
-    participant Document as document
+    participant Extension as Extension UI
     participant Script as script.js
-    participant BackgroundScript as background.js
-    User->>Document: Clicks on save-settings
-    Document->>Script: Triggers click event
-    Script->>BackgroundScript: Sends message to call saveSettings()
-    BackgroundScript-->>Script: Returns success message
-    Script-->>Document: Updates UI with success message
+    participant API as IPFS API
+    User->>Extension: Opens extension
+    User->>Extension: Clicks on settings tab
+    Extension->>Script: Triggers clickedSettings function
+    Script-->>User: Displays settings form
+    User->>Extension: Enters IP, port, and directory in form
+    User->>Extension: Clicks on save button
+    Extension->>Script: Triggers saveSettings function
+    Script->>Script: Validates directory input
+    Script->>Script: Calls createMFSDir function (if directory is valid)
+    Script->>API: Sends POST request to create MFS directory
+    API-->>Script: Returns response
+    Script->>Script: Checks response status
+    Script-->>User: Alerts user if creation failed
+    Script->>Script: Saves settings to local storage
+    Script-->>User: Updates UI with success message
 ```
 
-### Sequence of the "add-remove-button" click event
+### Sequence of how the table is populated when a user clicks on the Pin tab or opens the extension
 
 ```mermaid
 sequenceDiagram
     participant User
-    participant Document as document
+    participant Extension as Extension UI
     participant Script as script.js
-    participant BackgroundScript as background.js
-    User->>Document: Clicks on add-remove-button
-    Document->>Script: Triggers click event
-    Script->>BackgroundScript: Sends message to call addRemoveButtonToRow()
-    BackgroundScript-->>Script: Returns success message
-    Script-->>Document: Updates UI with success message
+    User->>Extension: Clicks on pinned tab
+    Extension->>Script: Triggers clickedPins function
+    Script->>Script: Gets pin-tab and settings-tab elements
+    Script->>Script: Adds "active" class to pin-tab and removes it from settings-tab
+    Script->>Script: Calls fetchMFSData function
+    Script->>Script: Calls getUniqueTypes function
+    Script-->>Extension: Updates pinned tab with table of pinned data
 ```
 
-### Sequence of the "filter-type" change event
+### Sequence of how a filter is applied to the table by the user
 
 ```mermaid
 sequenceDiagram
     participant User
-    participant Document as document
+    participant Extension as Extension UI
     participant Script as script.js
-    participant BackgroundScript as background.js
-    User->>Document: Changes filter-type
-    Document->>Script: Triggers change event
-    Script->>BackgroundScript: Sends message to call saveSettings()
-    BackgroundScript-->>Script: Returns success message
-    Script-->>Document: Updates UI with success message
+    User->>Extension: Opens extension
+    Extension->>Script: Triggers getUniqueTypes function
+    Script->>Script: Gets type-filter element
+    Script->>Script: Creates set of unique types
+    Script->>Script: Clears existing options in type-filter
+    Script->>Script: Adds unique types to type-filter element
+    Script-->>Extension: Updates type column with filtered data
+    User->>Extension: Table is updated with filter options
+    Extension->>Script: Triggers filterTable function
+    Script->>Script: Gets selected type and converts it to uppercase
+    Script->>Script: Gets table and rows
+    Script->>Script: Loops through rows
+    Script->>Script: Gets type value of each row
+    Script->>Script: Compares type value with selected type
+    Script->>Script: Sets display style to "none" for rows that don't match
+    Script-->>Extension: Updates table with filtered data
 ```
 
-### Sequence of the "create-mfs-dir" click event
+### Sequence of how the remove pin button is added to the table
+
+```mermaid
+sequenceDiagram
+    participant Extension as Extension UI
+    participant Script as script.js
+    participant Dom as DOM
+    note left of Extension: User opens extension
+    Extension->>Script: Triggers click event
+    note left of Script: Call to fetchMFSData() to acquire pinned data from IPFS
+    Script->>Dom: Sends message to call addRemoveButtonToRow()
+    Note over Dom,Script: Loop through each CID
+    Dom-->>Script: creates remove button element for row
+    Script-->>Extension: Updates table div with remove button
+```
+
+### Sequence of how a pin is removed from the table by the user
 
 ```mermaid
 sequenceDiagram
     participant User
-    participant Document as document
+    participant Extension as Extension UI
     participant Script as script.js
-    participant BackgroundScript as background.js
-    User->>Document: Clicks on create-mfs-dir
-    Document->>Script: Triggers click event
-    Script->>BackgroundScript: Sends message to call createMFSDir()
-    BackgroundScript-->>Script: Returns success message
-    Script-->>Document: Updates UI with success message
-```
-
-### Sequence of the "fetch-data" function
-
-```mermaid
-sequenceDiagram
-    participant Script as script.js
-    participant IPFS as IPFS Node
-    participant DOM
-    participant FetchMFSData as fetchMFSData()
-    Script->>FetchMFSData: Calls function
-    FetchMFSData->>IPFS: Sends request for MFS data
-    IPFS->>FetchMFSData: Returns MFS data
-    FetchMFSData->>DOM: Updates table with MFS data
-```
-
-### Sequence of the "fetchMFSData" function
-
-```mermaid
-sequenceDiagram
-    participant Script as script.js
-    participant IPFS as IPFS Node
-    participant DOM
-    participant FetchMFSData as fetchMFSData()
-    Script->>FetchMFSData: Calls function
-    FetchMFSData->>IPFS: Sends request for MFS data
-    IPFS->>FetchMFSData: Returns MFS data
-    FetchMFSData->>DOM: Updates table with MFS data
-```
-
-### Sequence of the "removePin" function
-
-```mermaid
-sequenceDiagram
-    participant Script as script.js
-    participant IPFS as IPFS Node
-    participant RemovePin as removePin()
-    Script->>RemovePin: Calls function
-    RemovePin->>IPFS: Sends request to remove pin
-    IPFS->>RemovePin: Returns success message
-```
-
-### Sequence of the "saveSettings" function
-
-```mermaid
-sequenceDiagram
-    participant Script as script.js
-    participant BackgroundScript as background.js
-    participant SaveSettings as saveSettings()
-    Script->>SaveSettings: Calls function
-    SaveSettings->>BackgroundScript: Sends message to save settings
-    BackgroundScript-->>SaveSettings: Returns success message
-```
-
-### Sequence of the "createMFSDir" function
-
-```mermaid
-sequenceDiagram
-    participant Script as script.js
-    participant IPFS as IPFS Node
-    participant CreateMFSDir as createMFSDir()
-    Script->>CreateMFSDir: Calls function
-    CreateMFSDir->>IPFS: Sends request to create MFS directory
-    IPFS->>CreateMFSDir: Returns success message
-```
-
-### Sequence of the "addRemoveButton" function
-
-```mermaid
-sequenceDiagram
-    participant Script as script.js
-    participant DOM
-    participant AddRemoveButton as addRemoveButtonToRow()
-    Script->>AddRemoveButton: Calls function for each row
-    AddRemoveButton->>DOM: Adds remove button to row
-```
-
-### Sequence of the "getUniqueTypes" function
-
-```mermaid
-sequenceDiagram
-    participant Script as script.js
-    participant DOM
-    participant GetUniqueTypes as getUniqueTypes()
-    Script->>GetUniqueTypes: Calls function
-    GetUniqueTypes->>DOM: Gets rows from table
-    GetUniqueTypes->>DOM: Updates filter dropdown with unique types
+    participant API as IPFS API
+    User->>Extension: Clicks on remove pin button
+    Extension->>Script: Triggers removePin function with CID and row index
+    Script->>Script: Gets node IP and port from local storage
+    Script->>API: Sends POST request to remove pin
+    API-->>Script: Returns response
+    Script->>Script: Checks response status
+    Script->>Script: If status is 200, deletes row from table
+    Script-->>User: Alerts user if removal failed
 ```
