@@ -53,6 +53,9 @@ async function fetchMFSData(directory) {
     dir = directory
   }
 
+  const curr = document.getElementById("current-dir");
+  curr.textContent = `Directory: ${dir}`
+
   chrome.storage.local.get(["node_ip", "node_port"]).then(async (keys) => {
     const response = await fetch(
       `http://${keys.node_ip}:${keys.node_port}/api/v0/files/ls?arg=${dir}&long=true&U=true`,
@@ -76,10 +79,13 @@ async function fetchMFSData(directory) {
         const indexCell = document.createElement("td");
         indexCell.textContent = x + 1;
 
+        const nameCell = document.createElement("td");
+        nameCell.textContent = result.Entries[x].Name.length > 12 ? result.Entries[x].Name.slice(0, 12) + "..." : result.Entries[x].Name;
+
         const cidCell = document.createElement("td");
         // apply CID value to id attribute
         const cid_value = result.Entries[x].Hash;
-        cidCell.textContent = result.Entries[x].Hash.slice(0, 24) + "...";
+        cidCell.textContent = "..." + result.Entries[x].Hash.slice(36);
 
         const typeCell = document.createElement("td");
         typeCell.textContent = result.Entries[x].Type == 1 ? "Directory" : "File";
@@ -97,6 +103,7 @@ async function fetchMFSData(directory) {
         }
 
         row.appendChild(indexCell);
+        row.append(nameCell);
         row.appendChild(cidCell);
         row.appendChild(typeCell);
         // Add remove button to row
@@ -283,6 +290,10 @@ async function saveSettings() {
     });
 }
 
+function resetDirectory() {
+  fetchMFSData("");
+}
+
 /*Create MFS directory in IPFS node*/
 async function createMFSDir(node_ip, node_port, directory) {
   const response = await fetch(
@@ -325,6 +336,10 @@ document.addEventListener("click", function (event) {
 document
   .getElementById("save-settings")
   .addEventListener("click", saveSettings);
+
+document
+  .getElementById("back")
+  .addEventListener("click", resetDirectory);
 
 // Create variable that stores the default dropdown value for the `Type` filter
 let lastState = localStorage.setItem("filterType", "All");

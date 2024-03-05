@@ -35,26 +35,33 @@
                 <button class="btn btn-primary" id="save-settings">Save</button>
             </div>
 
-            <table class="table table-bordered mt-3" id="pins">
-                <thead>
-                    <tr>
-                        <th class="centered-header">#</th>
-                        <th class="centered-header">CID</th>
-                        <!-- Create a dropdown list of unique values that appear in the 'Type' column -->
-                        <th class="centered-header">Select Type
-                            <select id="type-filter" class="form-select form-select-sm">
-                                <option value=""></option>
-                            </select></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td id="date"></td>
-                        <td id="areaName"></td>
-                        <td id="latestBy"></td>
-                    </tr>
-                </tbody>
-            </table>
+            <div id="pins">
+                <div style="display: flex; margin-top: 15px; justify-content: space-between;">
+                    <p id="current-dir">Directory: </p>
+                    <button style="align-self: flex-end; border: none;" id="back">Back</button>
+                </div>
+                <table class="table table-bordered mt-3">
+                    <thead>
+                        <tr>
+                            <th class="centered-header">#</th>
+                            <th class="centered-header">Name</th>
+                            <th class="centered-header">CID</th>
+                            <!-- Create a dropdown list of unique values that appear in the 'Type' column -->
+                            <th class="centered-header">Select Type
+                                <select id="type-filter" class="form-select form-select-sm">
+                                    <option value=""></option>
+                                </select></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td id="date"></td>
+                            <td id="areaName"></td>
+                            <td id="latestBy"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </body>
     <script src="script.js"></script>
