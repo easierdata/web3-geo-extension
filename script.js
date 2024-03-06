@@ -263,7 +263,7 @@ function filterTable() {
 
   // Loop through all table rows, and hide those who don't match the filter
   for (i = 1; i < rows.length; i++) {
-    td = rows[i].getElementsByTagName("td")[2]; // assuming "Type" column is the third column
+    td = rows[i].getElementsByTagName("td")[3]; // assuming "Type" column is the third column
     if (td) {
       txtValue = td.textContent || td.innerText;
       if (filter === "ALL" || txtValue.toUpperCase().indexOf(filter) > -1) {
