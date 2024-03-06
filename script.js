@@ -108,7 +108,7 @@ async function fetchMFSData(directory) {
         row.appendChild(cidCell);
         row.appendChild(typeCell);
         // Add remove button to row
-        row.appendChild(addRemoveButtonToRow(cid_value));
+        row.appendChild(addRemoveButtonToRow(cid_value, result.Entries[x].Name));
 
         tableBody.appendChild(row);
       }
@@ -117,7 +117,7 @@ async function fetchMFSData(directory) {
 }
 
 /* Add remove button to row */
-function addRemoveButtonToRow(cid) {
+function addRemoveButtonToRow(cid, fileName) {
   // Create a div and a button to display remove pin option
   const container = document.createElement("div");
   const hiddenInput = document.createElement("input");
@@ -133,25 +133,41 @@ function addRemoveButtonToRow(cid) {
   hiddenInput.id = "pin-id";
   hiddenInput.value = cid;
 
+  const nameInput = document.createElement("input");
+  nameInput.type = "hidden";
+  nameInput.id = "fileName";
+  nameInput.value = fileName;
+
   // Add elements to container
   container.appendChild(hiddenInput);
+  container.appendChild(nameInput);
   container.appendChild(button);
   return container;
 }
 
 /*Event action that removes the Pinned id from local IPFS node */
-async function removePin(cid, rowid) {
+async function removePin(cid, fileName, rowid) {
   chrome.storage.local.get(["node_ip", "node_port"]).then(async (keys) => {
-    const response = await fetch(
+    const curr = document.getElementById("current-dir");
+    const file = `${curr.getAttribute("data-dir")}${fileName}`;
+    let response = await fetch(
       `http://${keys.node_ip}:${keys.node_port}/api/v0/pin/rm?arg=${cid}`,
       {
         method: "POST",
       }
     );
+
+    response = await fetch(
+      `http://${keys.node_ip}:${keys.node_port}/api/v0/files/rm?arg=${file}&recursive=true&force=true`,
+      {
+        method: "POST",
+      }
+    );
+
     if (response.status === 200) {
-      // refresh the table by removing the row with the corresponding cid that was just removed
       const table = document.getElementById("pins");
       table.deleteRow(rowid);
+      alert("Successfully removed pin!")
     } else {
       alert("Failed to remove pin!");
     }
@@ -328,10 +344,11 @@ document.getElementById("type-filter").addEventListener("change", filterTable);
 document.addEventListener("click", function (event) {
   if (event.target.matches("#remove-pin")) {
     // Get the CID value from the hidden input element
+    const fileName = event.target.parentElement.children[1].value;
     const pinId = event.target.parentElement.firstChild.value;
     // Get the row index of the button that was clicked. Note that the index starts at 0 but the first row is the header
     const rowId = event.target.parentElement.parentElement.rowIndex;
-    removePin(pinId, rowId);
+    removePin(pinId, fileName, rowId);
   }
 });
 
