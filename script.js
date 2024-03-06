@@ -54,7 +54,8 @@ async function fetchMFSData(directory) {
   }
 
   const curr = document.getElementById("current-dir");
-  curr.textContent = `Directory: ${dir}`
+  curr.textContent = `Directory: ${dir}`;
+  curr.setAttribute("data-dir", dir);
 
   chrome.storage.local.get(["node_ip", "node_port"]).then(async (keys) => {
     const response = await fetch(
@@ -291,7 +292,8 @@ async function saveSettings() {
 }
 
 function resetDirectory() {
-  fetchMFSData("");
+  const curr = document.getElementById("current-dir");
+  fetchMFSData(`${curr.getAttribute("data-dir").split("/").slice(0, -2).join("/")}`);
 }
 
 /*Create MFS directory in IPFS node*/
