@@ -71,7 +71,7 @@ async function getIPFSMetadata() {
         
         const result = await chrome.runtime.sendMessage({ type: "get" });
         
-        const response = await fetch(`http://${JSON.parse(result).node_ip}:${JSON.parse(result).node_port}/api/v0/dht/findprovs?arg=${cid}`, {
+        const response = await fetch(`http://${JSON.parse(result).node_ip}:${JSON.parse(result).node_port}/api/v0/routing/findprovs?arg=${cid}`, {
             method: 'POST',
         });
 
