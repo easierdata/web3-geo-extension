@@ -118,6 +118,89 @@ async function handleMultiPinClick() {
     alert("Successfully pinned!")
 }
 
+async function handleMultiPinClick() {
+    const result = await chrome.runtime.sendMessage({ type: "get" });
+    const label = document.getElementById("cidArray");
+    const cids = label.innerText;
+
+    for (let x = 0; x < JSON.parse(cids).length; x++) {
+        let cid = JSON.parse(cids)[x];
+        const response = await fetch(`http://${JSON.parse(result).node_ip}:${JSON.parse(result).node_port}/api/v0/pin/add?arg=${cid}&recursive=true`, {
+            method: 'POST',
+        });
+
+        let mfs_response;
+        if (JSON.parse(result).node_dir != undefined && JSON.parse(result).node_dir.length > 1) {
+            mfs_response = await fetch(`http://${JSON.parse(result).node_ip}:${JSON.parse(result).node_port}/api/v0/files/cp?arg=/ipfs/${cid}&arg=${JSON.parse(result).node_dir}/${fileName}`, {
+                method: 'POST',
+            });
+        } else {
+            mfs_response = await fetch(`http://${JSON.parse(result).node_ip}:${JSON.parse(result).node_port}/api/v0/files/cp?arg=/ipfs/${cid}&arg=/${fileName}`, {
+                method: 'POST',
+            });
+        }
+        
+        if (response.status !== 200 && mfs_response.status !== 200) {
+            alert("Failed to pin, continuing")
+        } 
+    }
+
+    alert("Successfully pinned!")
+}
+
+async function handleExportClick() {
+    const result = await chrome.runtime.sendMessage({ type: "get" });
+    const label = document.getElementById("exportFeatures");
+    let features = JSON.parse(label.innerText);
+
+    const geojson = {
+        "type": "FeatureCollection",
+        "crs": {
+            "type": "name",
+            "properties": {
+                "name": "urn:ogc:def:crs:EPSG::4269"
+            }
+        },
+        features: features
+    }
+
+    console.log(geojson)
+
+    // Create form data and blob to post
+    const blob = new Blob([JSON.stringify(geojson)], { type: 'application/json' });
+    const formData = new FormData();
+    const filename = `export_${Math.floor(Math.random() * 100)}.geojson`
+    formData.append('file', blob, filename);
+
+    try {
+        const response = await fetch(`http://${JSON.parse(result).node_ip}:${JSON.parse(result).node_port}/api/v0/add?to-files=${filename}`, {
+            method: "POST",
+            body: formData,
+            redirect: "follow"
+        });
+    
+        const response_text = await response.text();
+
+        const cid = JSON.parse(response_text).Hash;
+
+        if (JSON.parse(result).node_dir != undefined && JSON.parse(result).node_dir.length > 1) {
+            mfs_response = await fetch(`http://${JSON.parse(result).node_ip}:${JSON.parse(result).node_port}/api/v0/files/cp?arg=/ipfs/${cid}&arg=${JSON.parse(result).node_dir}/${filename}`, {
+                method: 'POST',
+            });
+        } else {
+            mfs_response = await fetch(`http://${JSON.parse(result).node_ip}:${JSON.parse(result).node_port}/api/v0/files/cp?arg=/ipfs/${cid}&arg=/${filename}`, {
+                method: 'POST',
+            });
+        }
+
+        alert("Successfully exported!");
+    } catch (error) {
+        console.error(error);
+        alert("Failed to export!")
+    }
+}
+
+
 const delay = ms => new Promise(res => setTimeout(res, ms));
 
 /* Handle clicks */
@@ -133,6 +216,8 @@ document.addEventListener('click', function (event) {
         getIPFSMetadata();
     } else if (event.target.matches('#multiPin')){
         handleMultiPinClick();
+    } else if (event.target.matches('#export')){
+        handleExportClick();
     }
 });
 
