@@ -167,7 +167,7 @@ async function handleExportClick() {
     console.log(geojson)
 
     // Create form data and blob to post
-    const blob = new Blob([JSON.stringify(geojson)], { type: 'application/json' });
+    const blob = new Blob([JSON.stringify(geojson, null, 4)], { type: 'application/json' });
     const formData = new FormData();
     const filename = `export_${Math.floor(Math.random() * 100)}.geojson`
     formData.append('file', blob, filename);
